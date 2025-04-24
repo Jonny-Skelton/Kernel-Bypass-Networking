@@ -1,0 +1,2 @@
+Sent 200000 packets of 64 B
+Total 4609 ms (avg 23.045 µs)  min 3.906 µs  max 3696.045 µs
