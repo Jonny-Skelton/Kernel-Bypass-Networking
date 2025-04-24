@@ -1,4 +1,3 @@
-cat > server.c <<'EOF'
 #include <arpa/inet.h>
 #include <netinet/in.h>
 #include <stdlib.h>
@@ -33,4 +32,3 @@ int main(void) {
         sendto(sock, buf, n, 0, (struct sockaddr *)&peer, peerlen);
     }
 }
-EOF
