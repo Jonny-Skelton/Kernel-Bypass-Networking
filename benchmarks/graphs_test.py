@@ -1,14 +1,22 @@
-import re
-import pandas as pd, matplotlib.pyplot as plt, numpy as np, pathlib
+#!/usr/bin/env python3
+"""
+plot_xdp_benchmarks.py
+Produce stacked-bar CPU-util graphs (mpstat) and latency CDF/violin graphs
+from the XDP benchmark artefacts.
 
-# Parse Functions
-def parse_ping(file):
-    times = []
-    for line in pathlib.Path(file).read_text().splitlines():
-        if 'time=' in line:
-            t = float(line.split('time=')[1].split()[0])    # ms
-            times.append(t)
-    return pd.Series(times, name=pathlib.Path(file).stem)
+Run:  python3 plot_xdp_benchmarks.py
+      (PNG files written to ./fig_cpu_util.png and ./fig_latency.png)
+"""
+
+import re
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from pathlib import Path
+
+# ---------------------------------------------------------------------------
+# 1. Helpers to parse mpstat & ping-flood outputs
+# ---------------------------------------------------------------------------
 
 def load_mpstat(file):
     """
@@ -46,51 +54,19 @@ def load_ping_times(file):
     return np.array(times)
 
 
-baseline = parse_ping('benchmarks/baseline_ipv4.txt')
-xdp      = parse_ping('benchmarks/xdp_ipv4.txt')
-mp_baseline = load_mpstat('benchmarks/baseline_mpstat.txt')
-mp_xdp      = load_mpstat('benchmarks/xdp_mpstat.txt')
-rtt_baseline = load_ping_times('benchmarks/baseline_ping_flood.txt')
-rtt_xdp      = load_ping_times('benchmarks/xdp_ping_flood.txt')
+# ---------------------------------------------------------------------------
+# 2. Load data
+# ---------------------------------------------------------------------------
+bench = Path("benchmarks")
+mp_baseline = load_mpstat(bench / "mpstat_baseline.txt")
+mp_xdp      = load_mpstat(bench / "mpstat_xdp.txt")
 
-df       = pd.concat([baseline, xdp], axis=1)
+rtt_baseline = load_ping_times(bench / "ping_flood_baseline.txt")
+rtt_xdp      = load_ping_times(bench / "ping_flood_xdp.txt")
 
-# Grouped bar: mean & median 
-fig, ax = plt.subplots()
-metrics = ['mean', 'median']
-bar_w   = 0.35
-x       = np.arange(len(metrics))
-
-for i, col in enumerate(df):
-    vals = [getattr(df[col], m)() for m in metrics]
-    errs = df[col].std() if col == 'baseline_ipv4' else df[col].std()
-    ax.bar(x + i*bar_w, vals, bar_w, label=col, yerr=errs, capsize=4)
-
-ax.set_xticks(x + bar_w/2, metrics)
-ax.set_ylabel('RTT (ms)')
-ax.set_title('Central tendency with jitter')
-ax.legend()
-
-# Box 
-fig2, ax2 = plt.subplots()
-ax2.boxplot([baseline, xdp], labels=['Baseline', 'XDP'], showfliers=True)
-ax2.set_ylabel('RTT (ms)')
-ax2.set_title('Distribution of all 100 samples')
-
-# CDF 
-fig3, ax3 = plt.subplots()
-for col, ser in df.items():
-    sorted_t = np.sort(ser)
-    cdf      = np.arange(1, len(ser)+1) / len(ser) * 100
-    ax3.plot(sorted_t, cdf, label=col)
-
-ax3.set_xscale('log')
-ax3.set_xlabel('RTT (ms)')
-ax3.set_ylabel('CDF (%)')
-ax3.set_title('Tail-latency view (log scale)')
-ax3.legend()
-
-# stacked bar CPU utilisation
+# ---------------------------------------------------------------------------
+# 3. Figure 1 – stacked bar CPU utilisation
+# ---------------------------------------------------------------------------
 fig1, ax1 = plt.subplots(figsize=(6,4))
 
 categories = ['%usr','%sys','%irq','%soft','%idle']
@@ -115,9 +91,12 @@ ax1.set_title("Figure 1 – CPU budget (mpstat)")
 fig1.tight_layout()
 fig1.savefig("fig_cpu_util.png", dpi=300)
 
-#Latency CDF + split violins
-fig4, (ax_cdf, ax_vio) = plt.subplots(1, 2, figsize=(10,4), gridspec_kw={'width_ratios':[3,1]})
+# ---------------------------------------------------------------------------
+# 4. Figure 2 – Latency CDF + split violins
+# ---------------------------------------------------------------------------
+fig2, (ax_cdf, ax_vio) = plt.subplots(1, 2, figsize=(10,4), gridspec_kw={'width_ratios':[3,1]})
 
+# 4a. CDF
 for data, lab, col in [(rtt_baseline,"Baseline",'grey'), (rtt_xdp,"XDP",'tab:blue')]:
     s = np.sort(data)
     pct = np.linspace(0,100,len(s))
@@ -129,24 +108,22 @@ ax_cdf.grid(True, which='both', axis='x', ls=':')
 ax_cdf.legend()
 ax_cdf.set_title("Tail-latency CDF (flood-ping)")
 
+# 4b. Split violins (half-width each side)
 parts = ax_vio.violinplot([rtt_baseline, rtt_xdp], positions=[0.9, 1.1],
                           widths=0.8, showmeans=True, vert=True)
-
+# Colour them
 for pc, col in zip(parts['bodies'], ['grey','tab:blue']):
     pc.set_facecolor(col)
     pc.set_edgecolor('black')
     pc.set_alpha(0.7)
-
+# Clean up axes
 ax_vio.set_xticks([0.9,1.1], ['Baseline','XDP'])
 ax_vio.set_ylabel("RTT (ms)")
 ax_vio.set_title("Distribution snapshot")
 ax_vio.grid(axis='y', ls=':')
 
-fig4.tight_layout()
-fig4.savefig("fig_latency.png", dpi=300)
-
-plt.tight_layout()
-plt.show()
+fig2.tight_layout()
+fig2.savefig("fig_latency.png", dpi=300)
 
 print("✓ Wrote fig_cpu_util.png and fig_latency.png")
-
+plt.show()
