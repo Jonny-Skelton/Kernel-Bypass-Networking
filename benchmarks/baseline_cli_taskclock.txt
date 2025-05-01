@@ -4,3 +4,11 @@ Sent 200000 packets of 64 B
 Total 7015 ms (avg 35.077 µs)  min 3.906 µs  max 2761.963 µs
 Sent 200000 packets of 64 B
 Total 8627 ms (avg 43.137 µs)  min 3.906 µs  max 4091.064 µs
+
+ Performance counter stats for '/home/vboxuser/Kernel-Bypass-Networking/src/echocli 10.0.0.1 64 200000' (3 runs):
+
+          1,973.47 msec task-clock                       #    0.282 CPUs utilized               ( +- 13.43% )
+           197,851      context-switches                 #  100.256 K/sec                       ( +-  0.36% )
+
+             7.001 +- 0.946 seconds time elapsed  ( +- 13.51% )
+
