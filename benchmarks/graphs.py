@@ -13,7 +13,7 @@ baseline = parse_ping('baseline_ipv4.txt')
 xdp      = parse_ping('xdp_ipv4.txt')
 df       = pd.concat([baseline, xdp], axis=1)
 
-# 2A. Grouped bar: mean & median --------------------------------------------
+# Grouped bar: mean & median 
 fig, ax = plt.subplots()
 metrics = ['mean', 'median']
 bar_w   = 0.35
@@ -29,13 +29,13 @@ ax.set_ylabel('RTT (ms)')
 ax.set_title('Central tendency with jitter')
 ax.legend()
 
-# 2B. Box (or violin) --------------------------------------------------------
+# Box 
 fig2, ax2 = plt.subplots()
 ax2.boxplot([baseline, xdp], labels=['Baseline', 'XDP'], showfliers=True)
 ax2.set_ylabel('RTT (ms)')
 ax2.set_title('Distribution of all 100 samples')
 
-# 2C. CDF --------------------------------------------------------------------
+# CDF 
 fig3, ax3 = plt.subplots()
 for col, ser in df.items():
     sorted_t = np.sort(ser)

@@ -18,7 +18,7 @@ show-progs            - list attached XDP programs on both ends
 
 Configurable paths
 
-echo_prog_obj="$(pwd)/xdp_udp_echo.o"
+echo_prog_obj="$HOME/xdp-tutorial/packet-solutions/xdp_prog_kern_03.o"
 pass_prog_obj="$HOME/xdp-tutorial/basic01-xdp-pass/xdp_pass_kern.o"
 
 Netns names
@@ -55,7 +55,7 @@ echo "Attached XDP_PASS on $NS_CLI:$VETH1."
 }
 
 function attach_echo() {
-sudo ip netns exec $NS_SRV ip link set dev $VETH0 xdp object $echo_prog_obj sec xdp
+sudo ip netns exec $NS_SRV ip link set dev $VETH0 xdp object $echo_prog_obj sec xdp_icmp_echo
 echo "Attached UDP echo XDP on $NS_SRV:$VETH0."
 }
 
