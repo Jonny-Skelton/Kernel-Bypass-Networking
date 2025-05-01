@@ -1,0 +1,20 @@
+# Ignore virtual environment directories
+venv/
+.venv/
+
+# Optional: Add other common Python ignore patterns if not already present
+# Byte-code files
+*.pyc
+
+# IDE/editor specific files
+.vscode/
+.idea/
+
+# Build/distribution files
+dist/
+build/
+*.egg-info/
+
+# OS generated files
+.DS_Store
+Thumbs.db
