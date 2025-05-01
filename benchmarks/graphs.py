@@ -21,7 +21,6 @@ def load_mpstat(file):
     with open(file) as f:
         for line in f:
             sp = line.split()
-            # Heuristic: valid data rows have 12 columns and CPU is a number or "all"
             if len(sp) == 12 and (sp[1].isdigit() or sp[1] == 'all'):
                 rows.append(dict(zip(cols, sp)))
     if not rows:
@@ -94,7 +93,7 @@ ax3.legend()
 fig1, ax1 = plt.subplots(figsize=(6,4))
 
 categories = ['%usr','%sys','%irq','%soft','%idle']
-colors     = ['#4c72b0','#55a868','#c44e52','#8172b3','#bbbbbb']  # colour-blind OK
+colors     = ['#4c72b0','#55a868','#c44e52','#8172b3','#bbbbbb'] 
 
 def stack_bar(values, x_off, label):
     bottom = 0
@@ -112,8 +111,6 @@ ax1.set_ylim(0, 105)
 ax1.legend(categories, loc='upper right', frameon=False)
 ax1.set_title("Figure 1 – CPU budget (mpstat)")
 
-fig1.tight_layout()
-fig1.savefig("fig_cpu_util.png", dpi=300)
 
 #Latency CDF + split violins
 fig4, (ax_cdf, ax_vio) = plt.subplots(1, 2, figsize=(10,4), gridspec_kw={'width_ratios':[3,1]})
@@ -142,10 +139,7 @@ ax_vio.set_ylabel("RTT (ms)")
 ax_vio.set_title("Distribution snapshot")
 ax_vio.grid(axis='y', ls=':')
 
-fig4.tight_layout()
-fig4.savefig("fig_latency.png", dpi=300)
-
 plt.tight_layout()
 plt.show()
 
-print('Ping times parsed and plotted.')
+input('Press Enter to continue...')

@@ -1,0 +1,15 @@
+metric,baseline,xdp
+ping_mean_ms,0.0573,0.04045666666666667
+ping_median_ms,0.04,0.036
+ping_std_ms,0.12176158237779194,0.026089275380030634
+ping_min_ms,0.014,0.011
+ping_95p_ms,0.104,0.058
+ping_99p_ms,0.333,0.116
+ping_max_ms,1.64,0.396
+flood_mean_ms,0.0100562,0.0096162
+flood_99p_ms,0.076,0.079
+cpu_busy_pct,2.201999999999998,7.998000000000005
+cpu_usr_pct,1.286,4.258
+cpu_sys_pct,0.654,3.596
+cpu_irq_pct,0.0,0.0
+cpu_soft_pct,0.158,0.07400000000000001
